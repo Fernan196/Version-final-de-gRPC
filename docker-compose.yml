@@ -1,0 +1,31 @@
+services:
+  # El nombre de este servicio es "restaurante".
+  # Los otros contenedores usarán este nombre como si fuera un dominio DNS.
+  restaurante:
+    build:
+      context: ./Restaurante
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+
+  cliente:
+    build:
+      context: ./Cliente
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://restaurante:5000 # Aquí usamos el nombre del servicio de arriba
+    depends_on:
+      - restaurante
+    stdin_open: true # Necesario para que no se cierre la consola inmediatamente
+    tty: true
+
+  repartidor:
+    build:
+      context: ./Repartidor
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL=http://restaurante:5000
+    depends_on:
+      - restaurante
+    stdin_open: true # Necesario para que no se cierre la consola inmediatamente
+    tty: true
